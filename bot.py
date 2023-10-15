@@ -27,16 +27,16 @@ def main():
         try:
             response = requests.get(url, headers=headers, params=params)
             response.raise_for_status()
-            dvmn_response = response.json()
+            dvmn_check_list = response.json()
 
-            if dvmn_response['status'] == 'timeout':
-                logging.info(f'Нет новых сообщений: {dvmn_response["timestamp_to_request"]}')
+            if dvmn_check_list['status'] == 'timeout':
+                logging.info(f'Нет новых сообщений: {dvmn_check_list["timestamp_to_request"]}')
 
             else:
                 logging.info('Сообщение получено')
-                params['timestamp'] = dvmn_response['last_attempt_timestamp']
+                params['timestamp'] = dvmn_check_list['last_attempt_timestamp']
 
-                for new_attempt in dvmn_response['new_attempts']:
+                for new_attempt in dvmn_check_list['new_attempts']:
                     text = f'Проверка работы <b>{new_attempt["lesson_title"]}</b> завершена'
                     if new_attempt['is_negative']:
                         text += '<i>\n\nПреподователю всем понравилось!</i>'
