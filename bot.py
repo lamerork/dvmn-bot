@@ -11,6 +11,8 @@ def main():
 
     logging.basicConfig(level=logging.INFO)
 
+    logging.info('Бот запущен')
+
     url = 'https://dvmn.org/api/long_polling/'
     headers = {
         "Authorization": env.str('DVMN_TOKEN')
@@ -45,10 +47,10 @@ def main():
                     bot.send_message(chat_id=chat_id, text=text, timeout=300, parse_mode=telegram.ParseMode.HTML)
 
         except requests.exceptions.ReadTimeout:
-            logging.info('Время соединения истекло')
+            logging.warning('Время соединения истекло')
 
         except ConnectionError:
-            logging.info('Ошибка соединения')
+            logging.warning('Ошибка соединения')
             sleep(60)
 
 
