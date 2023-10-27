@@ -46,6 +46,7 @@ def main():
 
             if dvmn_check_list['status'] == 'timeout':
                 logger.info(f'Нет новых сообщений: {dvmn_check_list["timestamp_to_request"]}')
+                params['timestamp'] = dvmn_check_list['last_attempt_timestamp']
 
             else:
                 logger.info('Сообщение получено')
