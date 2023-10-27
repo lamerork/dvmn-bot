@@ -5,13 +5,30 @@ import telegram
 from time import sleep
 
 
+class TelegramLogsHandler(logging.Handler):
+
+    def __init__(self, tg_bot, chat_id):
+        super().__init__()
+        self.chat_id = chat_id
+        self.tg_bot = tg_bot
+
+    def emit(self, record):
+        log_entry = self.format(record)
+        self.tg_bot.send_message(chat_id=self.chat_id, text=log_entry)
+
+
 def main():
     env = Env()
     env.read_env()
 
-    logging.basicConfig(level=logging.INFO)
+    bot = telegram.Bot(token=env.str('TELEGRAM_TOKEN'))
+    chat_id = env.str('TELEGRAM_CHAT_ID')
 
-    logging.info('Бот запущен')
+    logger = logging.getLogger('Logger')
+    logger.setLevel(logging.INFO)
+    logger.addHandler(TelegramLogsHandler(bot, chat_id))
+
+    logger.info('Бот запущен')
 
     url = 'https://dvmn.org/api/long_polling/'
     headers = {
@@ -19,10 +36,6 @@ def main():
     }
 
     params = {}
-
-    bot = telegram.Bot(token=env.str('TELEGRAM_TOKEN'))
-
-    chat_id = env.str('TELEGRAM_CHAT_ID')
 
     while True:
 
@@ -32,10 +45,10 @@ def main():
             dvmn_check_list = response.json()
 
             if dvmn_check_list['status'] == 'timeout':
-                logging.info(f'Нет новых сообщений: {dvmn_check_list["timestamp_to_request"]}')
+                logger.info(f'Нет новых сообщений: {dvmn_check_list["timestamp_to_request"]}')
 
             else:
-                logging.info('Сообщение получено')
+                logger.info('Сообщение получено')
                 params['timestamp'] = dvmn_check_list['last_attempt_timestamp']
 
                 for new_attempt in dvmn_check_list['new_attempts']:
@@ -47,10 +60,10 @@ def main():
                     bot.send_message(chat_id=chat_id, text=text, timeout=300, parse_mode=telegram.ParseMode.HTML)
 
         except requests.exceptions.ReadTimeout:
-            logging.warning('Время соединения истекло')
+            logger.warning('Время соединения истекло')
 
         except ConnectionError:
-            logging.warning('Ошибка соединения')
+            logger.warning('Ошибка соединения')
             sleep(60)
 
 
