@@ -65,6 +65,8 @@ def main():
         except ConnectionError:
             logger.warning('Ошибка соединения')
             sleep(60)
+        except Exception as err:
+            logger.exception(err)
 
 
 if __name__ == '__main__':
