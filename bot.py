@@ -4,6 +4,8 @@ import logging
 import telegram
 from time import sleep
 
+logger = logging.getLogger('Logger')
+
 
 class TelegramLogsHandler(logging.Handler):
 
@@ -21,12 +23,11 @@ def main():
     env = Env()
     env.read_env()
 
-    bot = telegram.Bot(token=env.str('TELEGRAM_TOKEN'))
+    logger_bot = telegram.Bot(token=env.str('TELEGRAM_LOG_TOKEN'))
     chat_id = env.str('TELEGRAM_CHAT_ID')
 
-    logger = logging.getLogger('Logger')
     logger.setLevel(logging.INFO)
-    logger.addHandler(TelegramLogsHandler(bot, chat_id))
+    logger.addHandler(TelegramLogsHandler(logger_bot, chat_id))
 
     logger.info('Бот запущен')
 
@@ -34,6 +35,8 @@ def main():
     headers = {
         "Authorization": env.str('DVMN_TOKEN')
     }
+
+    bot = telegram.Bot(token=env.str('TELEGRAM_TOKEN'))
 
     params = {}
 
@@ -46,7 +49,7 @@ def main():
 
             if dvmn_check_list['status'] == 'timeout':
                 logger.info(f'Нет новых сообщений: {dvmn_check_list["timestamp_to_request"]}')
-                params['timestamp'] = dvmn_check_list['last_attempt_timestamp']
+                params['timestamp'] = dvmn_check_list['timestamp_to_request']
 
             else:
                 logger.info('Сообщение получено')
