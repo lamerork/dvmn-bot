@@ -58,9 +58,9 @@ def main():
                 for new_attempt in dvmn_check_list['new_attempts']:
                     text = f'Проверка работы <b>{new_attempt["lesson_title"]}</b> завершена'
                     if new_attempt['is_negative']:
-                        text += '<i>\n\nПреподователю всем понравилось!</i>'
-                    else:
                         text += '<i>\n\nВ работе нашлись ошибки!!!</i>'
+                    else:
+                        text += '<i>\n\nПреподователю всем понравилось!</i>'
                     bot.send_message(chat_id=chat_id, text=text, timeout=300, parse_mode=telegram.ParseMode.HTML)
 
         except requests.exceptions.ReadTimeout:
