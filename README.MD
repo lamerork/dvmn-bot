@@ -21,7 +21,7 @@ docker build -t dvmn-bot .
 ```
 Для запуска бота в контейнере используйте команду
 ```sh
-docker run dvmn-bot
+docker run --env-file .env dvmn-bot
 ```
 ### Как запустить без контейнера
 
